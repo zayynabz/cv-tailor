@@ -19,15 +19,6 @@ Multiple job posts.
 Tailored instantly.
 ```
 
-## 🔐 API Access
-
-The backend API is protected with an authentication token.
-
-If you'd like to test the extension, please contact me to request a temporary access token.
-
-This helps prevent abuse and unauthorized API usage.
-
-
 
 ## 📸 Preview
 <table>
