@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>CV Tailor</title>
+    <link rel="stylesheet" href="popup.css">
+    <script src="lib/pdf.min.js"></script>
+    <script src="lib/mammoth.min.js"></script>
+</head>
+<body>
+<div class="app">
+
+    <!-- Sidebar nav -->
+    <nav class="sidebar">
+        <div class="brand">
+            <span class="brand-mark">CV</span>
+            <span class="brand-sub">Tailor</span>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-tab="dashboard">
+                <span class="nav-icon">⊞</span>
+                <span>Home</span>
+            </button>
+            <button class="nav-btn" data-tab="upload">
+                <span class="nav-icon">↑</span>
+                <span>Upload</span>
+            </button>
+            <button class="nav-btn" data-tab="tailor">
+                <span class="nav-icon">⚡</span>
+                <span>Tailor</span>
+            </button>
+            <button class="nav-btn" data-tab="history">
+                <span class="nav-icon">◷</span>
+                <span>History</span>
+            </button>
+        </div>
+        <div class="sidebar-footer">
+            <button class="icon-action" id="theme-toggle" title="Toggle theme">◐</button>
+            <button class="icon-action" id="settings-btn" title="Settings">⚙</button>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main">
+
+        <!-- Dashboard -->
+        <section id="dashboard-tab" class="tab active">
+            <div class="page-head">
+                <h1>Dashboard</h1>
+                <p class="page-sub">Your CV optimization hub</p>
+            </div>
+
+            <div class="kpi-row">
+                <div class="kpi">
+                    <div class="kpi-label">CV Status</div>
+                    <div class="kpi-value" id="stat-cv-status">—</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-label">Tailored</div>
+                    <div class="kpi-value" id="stat-tailored">0</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-label">Avg. time</div>
+                    <div class="kpi-value">~30s</div>
+                </div>
+            </div>
+
+            <div class="guide-block">
+                <div class="guide-title">How it works</div>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <span class="step-num">01</span>
+                        <div>
+                            <strong>Upload your CV</strong>
+                            <p>PDF, DOCX, or plain text</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">02</span>
+                        <div>
+                            <strong>Open a job posting</strong>
+                            <p>LinkedIn, Indeed, any site</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">03</span>
+                        <div>
+                            <strong>Click Tailor</strong>
+                            <p>AI rewrites your CV to match</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">04</span>
+                        <div>
+                            <strong>Export as PDF</strong>
+                            <p>Ready to send in seconds</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-actions">
+                <button class="btn btn-primary" id="quick-upload-btn">Upload CV</button>
+                <button class="btn btn-ghost" id="quick-settings-btn">Settings</button>
+            </div>
+        </section>
+
+        <!-- Upload -->
+        <section id="upload-tab" class="tab">
+            <div class="page-head">
+                <h1>Upload CV</h1>
+                <p class="page-sub">PDF, DOCX, or TXT · Max 10 MB</p>
+            </div>
+
+            <div class="drop-zone" id="upload-area">
+                <div class="drop-icon">↑</div>
+                <p class="drop-label">Drop your file here</p>
+                <p class="drop-sub">or <button class="inline-link" id="file-picker-btn">browse</button></p>
+                <input type="file" id="file-input" accept=".pdf,.docx,.txt" hidden />
+            </div>
+
+            <div id="file-preview" class="file-card hidden">
+                <div class="file-card-head">
+                    <div class="file-meta">
+                        <span class="file-icon">▤</span>
+                        <div>
+                            <div class="file-name" id="preview-filename">—</div>
+                            <div class="file-size" id="preview-size">—</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-ghost btn-sm" id="remove-file-btn">Remove</button>
+                </div>
+                <textarea id="preview-text" class="file-preview-text editable" spellcheck="false" placeholder="Extracted text will appear here — you can edit before saving…"></textarea>
+            </div>
+
+            <div id="upload-status" class="status-msg hidden"></div>
+
+            <button class="btn btn-primary w-full" id="confirm-upload-btn">Confirm &amp; Save</button>
+
+            <div class="divider"><span>or paste manually</span></div>
+
+            <textarea id="manual-cv-input" class="textarea" placeholder="Paste your CV content here…" rows="6"></textarea>
+            <button class="btn btn-ghost w-full" id="save-manual-cv-btn">Save Text</button>
+        </section>
+
+        <!-- Tailor -->
+        <section id="tailor-tab" class="tab">
+            <div class="page-head">
+                <h1>Tailor</h1>
+                <p class="page-sub">Navigate to a job posting, then hit the button</p>
+            </div>
+
+            <div id="tailor-status" class="status-msg hidden"></div>
+
+            <div class="lang-row">
+                <span class="lang-label">Output language</span>
+                <div class="lang-opts">
+                    <button class="lang-opt active" data-lang="auto">Auto-detect</button>
+                    <button class="lang-opt" data-lang="keep">Keep CV language</button>
+                    <button class="lang-opt" data-lang="job">Match job language</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg w-full" id="tailor-btn">⚡ Extract &amp; Tailor</button>
+
+            <div id="results-container" class="results hidden">
+                <div class="results-bar">
+                    <div class="result-tabs">
+                        <button class="rtab active" data-result-tab="tailored">CV</button>
+                        <button class="rtab" data-result-tab="changes">Changes</button>
+                        <button class="rtab" data-result-tab="gaps">Gaps</button>
+                        <button class="rtab" data-result-tab="comparison">Compare</button>
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn btn-ghost btn-sm" id="copy-cv-btn">Copy</button>
+                        <div class="export-wrap">
+                            <button class="btn btn-primary btn-sm" id="export-dropdown">Export ▾</button>
+                            <div class="export-menu hidden">
+                                <button id="export-txt">Save as TXT</button>
+                                <button id="export-pdf">Save as PDF</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-ghost btn-sm" id="new-tailor-btn">Reset</button>
+                    </div>
+                </div>
+
+                <div id="tailored-tab" class="rpanel active">
+                    <div class="cv-out" id="tailored-cv-display"></div>
+                </div>
+                <div id="changes-tab" class="rpanel">
+                    <ul class="item-list" id="changes-list"></ul>
+                </div>
+                <div id="gaps-tab" class="rpanel">
+                    <ul class="item-list gaps" id="gaps-list"></ul>
+                </div>
+                <div id="comparison-tab" class="rpanel">
+                    <div class="compare-grid">
+                        <div class="compare-col">
+                            <div class="compare-label">Original</div>
+                            <div class="cv-out" id="original-cv-display"></div>
+                        </div>
+                        <div class="compare-col">
+                            <div class="compare-label accent">Tailored</div>
+                            <div class="cv-out" id="comparison-tailored-display"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History -->
+        <section id="history-tab" class="tab">
+            <div class="page-head">
+                <h1>History</h1>
+                <p class="page-sub">Past tailoring sessions</p>
+            </div>
+            <div id="history-list" class="history-list">
+                <div class="empty-state">
+                    <div class="empty-icon">◷</div>
+                    <p>No sessions yet</p>
+                </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="clear-history-btn">Clear all</button>
+        </section>
+
+        <!-- Settings overlay -->
+        <div id="settings-overlay" class="overlay hidden">
+            <div class="modal">
+                <div class="modal-head">
+                    <span class="modal-title">Settings</span>
+                    <button class="modal-close" id="settings-close">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="field-group">
+                        <label class="field-label">Backend URL</label>
+                        <input class="field-input" type="text" id="backend-url" placeholder="http://localhost:3000 or https://your-northflank-service.run" />
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Auth Token</label>
+                        <input class="field-input" type="password" id="auth-token" placeholder="Secret token" />
+                        <span class="field-hint">Stored locally, never sent elsewhere</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Theme</label>
+                        <div class="theme-row">
+                            <button class="theme-opt" data-theme="dark">Dark</button>
+                            <button class="theme-opt" data-theme="light">Light</button>
+                        </div>
+                    </div>
+                    <p class="settings-meta">CV Tailor v2.0 · © 2026</p>
+                </div>
+                <div class="modal-foot">
+                    <button class="btn btn-primary w-full" id="save-settings-btn">Save</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</div>
+
+<!-- Error screen -->
+<div id="error-container" class="error-screen hidden">
+    <p id="error-text">Failed to load</p>
+    <button class="btn btn-ghost btn-sm" id="error-retry">Retry</button>
+</div>
+
+<!-- Toasts -->
+<div id="toast-container" class="toast-stack"></div>
+
+<script src="popup.js"></script>
+</body>
+</html>
